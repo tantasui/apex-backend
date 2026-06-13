@@ -13,7 +13,8 @@ RUN mkdir src && echo 'fn main() {}' > src/main.rs
 RUN cargo build --release
 RUN rm src/main.rs
 
-# Build the real binary
+# Build the real binary (migrations must be present — sqlx::migrate! resolves at compile time)
+COPY migrations ./migrations
 COPY src ./src
 RUN touch src/main.rs && cargo build --release
 
