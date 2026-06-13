@@ -1,0 +1,25 @@
+[package]
+name = "apex-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1.40", features = ["full"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "chrono", "json"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bcs = "0.1"
+base64 = "0.22"
+sui-sdk-types = { version = "0.3", features = ["serde", "hash"] }
+sui-crypto = { version = "0.3", features = ["ed25519"] }
+bech32 = { version = "0.11", default-features = false, features = ["alloc"] }
+sui-transaction-builder = { version = "0.3", default-features = false }
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono = { version = "0.4", features = ["serde"] }
+dotenvy = "0.15"
