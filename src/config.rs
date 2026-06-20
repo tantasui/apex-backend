@@ -12,6 +12,10 @@ pub struct Config {
     pub pool_config_id: Option<String>,
     pub keeper_cap_id: Option<String>,
     pub sui_keeper_key: Option<String>,
+    /// Bearer token for POST /admin/pools. Admin routes are disabled when unset.
+    pub admin_secret: Option<String>,
+    /// Comma-separated oracle object IDs used as the default for new pools.
+    pub pool_oracle_ids: Option<Vec<String>>,
 }
 
 fn non_empty(var: &str) -> Option<String> {
@@ -29,6 +33,13 @@ impl Config {
         let sui_jsonrpc_url = non_empty("SUI_JSONRPC_URL")
             .unwrap_or_else(|| "https://fullnode.testnet.sui.io:443".to_string());
 
+        let pool_oracle_ids = non_empty("POOL_ORACLE_IDS").map(|s| {
+            s.split(',')
+                .map(|id| id.trim().to_string())
+                .filter(|id| !id.is_empty())
+                .collect()
+        });
+
         Ok(Self {
             port,
             database_url,
@@ -37,6 +48,8 @@ impl Config {
             pool_config_id: non_empty("POOL_CONFIG_ID"),
             keeper_cap_id: non_empty("KEEPER_CAP_ID"),
             sui_keeper_key: non_empty("SUI_KEEPER_KEY"),
+            admin_secret: non_empty("ADMIN_SECRET"),
+            pool_oracle_ids,
         })
     }
 

@@ -1,3 +1,4 @@
+pub mod admin;
 pub mod leaderboard;
 pub mod pools;
 pub mod preview;
@@ -8,7 +9,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
 
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::Router;
 use sqlx::PgPool;
 use tokio::sync::Mutex;
@@ -58,9 +59,13 @@ pub fn router(state: AppState) -> Router {
         .route("/users/{address}/rank", get(users::rank))
         .route("/leaderboard", get(leaderboard::leaderboard));
 
+    let admin = Router::new()
+        .route("/pools", post(admin::create_pool));
+
     Router::new()
         .route("/health", get(stats::health))
         .nest("/api/v1", api)
+        .nest("/admin", admin)
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http())
         .with_state(state)

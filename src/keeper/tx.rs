@@ -67,6 +67,10 @@ pub enum CallArg {
     OwnedKeeperCap,
     /// BCS-encoded `vector<u64>` (oracle results).
     PureU64Vec(Vec<u64>),
+    /// BCS-encoded single `u64`.
+    PureU64(u64),
+    /// BCS-encoded `vector<address>` / `vector<ID>` (oracle object IDs).
+    PureObjectIdVec(Vec<String>),
 }
 
 pub struct KeeperCtx<'a> {
@@ -113,6 +117,21 @@ pub async fn execute_call(
                 ))
             }
             CallArg::PureU64Vec(values) => tx.pure(&values),
+            CallArg::PureU64(value) => tx.pure(&value),
+            CallArg::PureObjectIdVec(ids) => {
+                let bytes: anyhow::Result<Vec<[u8; 32]>> = ids
+                    .iter()
+                    .map(|id| {
+                        let addr = Address::from_str(id).context("bad oracle id")?;
+                        let arr: [u8; 32] = addr
+                            .as_bytes()
+                            .try_into()
+                            .map_err(|_| anyhow!("Address must be 32 bytes"))?;
+                        Ok(arr)
+                    })
+                    .collect();
+                tx.pure(&bytes?)
+            }
         };
         built_args.push(built);
     }

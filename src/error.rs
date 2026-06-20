@@ -13,6 +13,10 @@ pub enum AppError {
     BadRequest(String),
     #[error("chain integration is not configured on this server")]
     ChainNotConfigured,
+    #[error("unauthorized")]
+    Unauthorized,
+    #[error("{0}")]
+    Internal(String),
     #[error("upstream RPC error: {0}")]
     Upstream(#[from] anyhow::Error),
     #[error("database error: {0}")]
@@ -27,6 +31,8 @@ impl AppError {
             AppError::NotFound(_) => ("not_found", StatusCode::NOT_FOUND),
             AppError::BadRequest(_) => ("bad_request", StatusCode::BAD_REQUEST),
             AppError::ChainNotConfigured => ("chain_not_configured", StatusCode::SERVICE_UNAVAILABLE),
+            AppError::Unauthorized => ("unauthorized", StatusCode::UNAUTHORIZED),
+            AppError::Internal(_) => ("internal_error", StatusCode::INTERNAL_SERVER_ERROR),
             AppError::Upstream(_) => ("upstream_error", StatusCode::BAD_GATEWAY),
             AppError::Db(_) => ("internal_error", StatusCode::INTERNAL_SERVER_ERROR),
             AppError::Math(_) => ("unrepresentable_range", StatusCode::UNPROCESSABLE_ENTITY),
